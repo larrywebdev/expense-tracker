@@ -1,16 +1,6 @@
 "use client";
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { useMemo, useState } from "react";
-
+import { BsPlusCircleFill } from "react-icons/bs";
 import DebouncedInput from "@/components/DebouncedInput.js";
-import { X } from "lucide-react";
 import FilterPopover from "@/components/FilterPopover";
 import MultiSelect from "@/components/MultiSelect";
 import { Button } from "@/components/ui/button";
@@ -22,13 +12,84 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { categoryOptions } from "@/lib/data-service";
+import { deleteTransaction } from "@/lib/data-service";
+import { useTransactionStore } from "@/store/useTransactionStore";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { Plus, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { getColumns } from "./columns";
-export function DataTable({ data, onEdit }) {
+
+export function DataTable({
+  transactions: data,
+  categories,
+  currency,
+  dateFormat,
+  theme,
+}) {
+  const { addTransactionMode, editTransactionMode } = useTransactionStore();
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({ type: false });
-  const cols = useMemo(() => getColumns({ onEdit }), [onEdit]);
+  const [open, setOpen] = useState(false);
+
+  const showConfirmToast = (transactionId) => {
+    setOpen(true);
+
+    const confirmId = `delete-${transactionId}`;
+
+    toast("Are you sure you want to delete this?", {
+      id: confirmId,
+      duration: Infinity,
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            toast.dismiss(confirmId);
+
+            const promise = deleteTransaction(transactionId);
+
+            toast.promise(promise, {
+              loading: "Deleting transaction...",
+              success: "Transaction deleted",
+              error: "Failed to delete transaction",
+            });
+
+            await promise;
+            setOpen(false);
+          } catch (error) {
+            console.error(error);
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {
+          toast.dismiss(confirmId);
+          setOpen(false);
+        },
+      },
+    });
+  };
+
+  const cols = useMemo(
+    () =>
+      getColumns({
+        editTransactionMode,
+        showConfirmToast,
+        currency,
+        dateFormat,
+      }),
+    [],
+  );
+
   const table = useReactTable({
     data,
     columns: cols,
@@ -64,32 +125,37 @@ export function DataTable({ data, onEdit }) {
     else column.setFilterValue([]);
   };
   return (
-    <>
-      <div className="flex items-center py-4">
+    <div className="w-full">
+      {open && <div className="fixed inset-0 z-25 bg-black/40" />}
+      <div className="grid gap-2 sm:gap-4 lg:gap-3 sm:grid-cols-2 lg:grid-cols-4 py-4">
         <DebouncedInput
           value={table.getColumn("description")?.getFilterValue() ?? ""}
           onChange={(val) =>
             table.getColumn("description")?.setFilterValue(val)
           }
           placeholder="Search description..."
-          className="max-w-sm"
         />
-        <div className="p-4 w-[300px]">
-          <MultiSelect
-            options={categoryOptions}
-            value={categoriesValue}
-            onChange={setCategories}
-            placeholder="Select categories"
-          />
-        </div>
+        <MultiSelect
+          options={categories}
+          value={categoriesValue}
+          onChange={setCategories}
+          placeholder="Select categories"
+        />
+
         <FilterPopover table={table} />
         <button
           aria-label="Add"
-          onClick={() => onEdit()}
-          className="rounded-lg py-1.75 px-7.5 font-bold text-sm text-white bg-black m-auto"
+          onClick={addTransactionMode}
+          className="hidden sm:flex rounded-lg py-1.75 px-5 font-semibold text-sm text-white bg-black justify-self-end items-center gap-1"
         >
+          <Plus size={17} />
           Add Transaction
         </button>
+        <BsPlusCircleFill
+          className="inline sm:hidden cursor-pointer place-self-end"
+          size={40}
+          onClick={addTransactionMode}
+        />
       </div>
       {activeFilters.length > 0 && (
         <div className="flex gap-1 items-center text-sm mb-3">
@@ -97,7 +163,8 @@ export function DataTable({ data, onEdit }) {
           {activeFilters.map((filter) => (
             <div
               key={filter}
-              className="px-2 py-1 bg-blue-500 text-white rounded-sm capitalize flex gap-1 items-center"
+              className="px-2 py-1 text-white rounded-sm capitalize flex gap-1 items-center"
+              style={{ backgroundColor: theme }}
             >
               {filter}{" "}
               <button
@@ -135,7 +202,7 @@ export function DataTable({ data, onEdit }) {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -175,6 +242,6 @@ export function DataTable({ data, onEdit }) {
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

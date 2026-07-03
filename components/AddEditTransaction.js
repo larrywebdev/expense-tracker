@@ -19,53 +19,65 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categoryOptions } from "@/lib/data-service";
-import { transactionSchema } from "@/lib/transactionSchema";
+import {
+  addTransactionSchema,
+  editTransactionSchema,
+} from "@/lib/schema/transaction.schema";
 import { useForm } from "@tanstack/react-form";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { DateSelector } from "./DateSelector";
+import { useTransactionStore } from "@/store/useTransactionStore";
+import { useEffect } from "react";
+import { addTransaction, updateTransaction } from "@/lib/data-service";
 
-export function AddEditDialog({ open, onOpenChange, data }) {
-  const capitalize = (str) => {
-    return str?.[0].toUpperCase() + str?.slice(1);
-  };
+export function AddEditTransaction({ categories }) {
+  const { isOpen, mode, selectedItem, close } = useTransactionStore();
+
+  const getFormValues = (item) => ({
+    ...(item?.id ? { id: item.id } : {}),
+    description: item?.description || "",
+    amount: item?.amount.toString() || "",
+    payment_method: item?.payment_method || "",
+    category: item?.category || "",
+    type: item?.type || "",
+    date:
+      item?.date ||
+      new Date().toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+    status: item?.status || "",
+  });
 
   const form = useForm({
-    defaultValues: {
-      description: capitalize(data?.description) || "",
-      amount: data?.amount || "",
-      paymentMethod: data?.paymentMethod || "",
-      category: data?.category || "",
-      type: data?.type || "",
-      date:
-        data?.date ||
-        new Date().toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }),
-      status: data?.status || "",
-    },
+    defaultValues: getFormValues(selectedItem),
     validators: {
-      onSubmit: transactionSchema,
+      onSubmit: mode === "Edit" ? editTransactionSchema : addTransactionSchema,
     },
     onSubmit: async ({ value }) => {
-      const fd = new FormData();
-      Object.entries(value).forEach(([key, value]) =>
-        fd.append(key, String(value)),
-      );
-
-      console.log(Object.fromEntries(fd));
-      toast.success("Expense saved successfully");
-      form.reset();
-
-      // if (result?.success) {
-      //   form.reset();
-      // } else {
-      //   toast.error(result?.error || "Something went wrong");
-      // }
+      try {
+        if (mode === "Add") {
+          await addTransaction(value);
+          toast.success("Transaction saved");
+          form.reset();
+          close();
+        }
+        if (mode === "Edit") {
+          await updateTransaction(value);
+          toast.success("Transaction updated successfully");
+          form.reset();
+          close();
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
     },
   });
+
+  useEffect(() => {
+    form.reset(getFormValues(selectedItem));
+  }, [selectedItem]);
 
   const errorMsg = (field) =>
     field.state.meta.errors?.map((err, index) => (
@@ -73,21 +85,25 @@ export function AddEditDialog({ open, onOpenChange, data }) {
         {err.message}
       </p>
     ));
-  if (!open) return null;
+
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:w-max" aria-describedby={undefined}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
+      <DialogContent
+        className="sm:w-max h-[90%] max-h-150"
+        aria-describedby={undefined}
+      >
         <DialogHeader>
-          <DialogTitle>Edit transaction</DialogTitle>
+          <DialogTitle>{mode} transaction</DialogTitle>
         </DialogHeader>
 
         <form
-          onSubmit={async (e) => {
+          onSubmit={(e) => {
             e.preventDefault();
-            await form.handleSubmit();
-            onOpenChange(false);
+            form.handleSubmit();
           }}
-          className="grid"
+          className="grid overflow-y-scroll"
         >
           <form.Field name="description">
             {(field) => (
@@ -107,7 +123,7 @@ export function AddEditDialog({ open, onOpenChange, data }) {
             )}
           </form.Field>
 
-          <div className="flex gap-3">
+          <div className="grid sm:flex gap-3">
             <form.Field name="amount">
               {(field) => (
                 <div className="grid">
@@ -125,7 +141,7 @@ export function AddEditDialog({ open, onOpenChange, data }) {
                 </div>
               )}
             </form.Field>
-            <form.Field name="paymentMethod">
+            <form.Field name="payment_method">
               {(field) => (
                 <div className="grid">
                   <Label className="mb-1">Payment Method</Label>
@@ -134,7 +150,7 @@ export function AddEditDialog({ open, onOpenChange, data }) {
                       value={field.state.value}
                       onValueChange={field.handleChange}
                     >
-                      <SelectTrigger className="w-55">
+                      <SelectTrigger className="w-full sm:w-55">
                         <SelectValue placeholder={field.state.value} />
                       </SelectTrigger>
                       <SelectContent>
@@ -157,7 +173,7 @@ export function AddEditDialog({ open, onOpenChange, data }) {
               )}
             </form.Field>
           </div>
-          <div className="flex gap-3">
+          <div className="grid sm:flex gap-3">
             <form.Field name="category">
               {(field) => (
                 <div className="grid">
@@ -167,15 +183,15 @@ export function AddEditDialog({ open, onOpenChange, data }) {
                       value={field.state.value}
                       onValueChange={field.handleChange}
                     >
-                      <SelectTrigger className="w-55">
+                      <SelectTrigger className="w-full sm:w-55">
                         <SelectValue placeholder={field.state.value} />
                       </SelectTrigger>
                       <SelectContent>
-                        {categoryOptions.map(({ label, value }) => (
+                        {categories.map(({ label }) => (
                           <SelectItem
                             className="cursor-pointer"
-                            value={value}
-                            key={value}
+                            value={label}
+                            key={label}
                           >
                             {label}
                           </SelectItem>
@@ -212,7 +228,7 @@ export function AddEditDialog({ open, onOpenChange, data }) {
               )}
             </form.Field>
           </div>
-          <div className="flex gap-3">
+          <div className="grid sm:flex gap-3">
             <DateSelector error={errorMsg} form={form} />
 
             <form.Field name="status">
@@ -224,7 +240,7 @@ export function AddEditDialog({ open, onOpenChange, data }) {
                       value={field.state.value}
                       onValueChange={field.handleChange}
                     >
-                      <SelectTrigger className="w-55">
+                      <SelectTrigger className="w-full sm:w-55">
                         <SelectValue placeholder={field.state.value} />
                       </SelectTrigger>
                       <SelectContent>
@@ -247,7 +263,9 @@ export function AddEditDialog({ open, onOpenChange, data }) {
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" onClick={() => close()}>
+                Cancel
+              </Button>
             </DialogClose>
             <form.Subscribe
               selector={(state) => [

@@ -1,19 +1,46 @@
 "use client";
 
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
-export function getColumns({ onEdit } = {}) {
-  const capitalize = (str) => {
-    return str?.[0].toUpperCase() + str?.slice(1);
+function getCurrencySymbol(symbol) {
+  const parts = new Intl.NumberFormat("en", {
+    style: "currency",
+    currency: symbol,
+  }).formatToParts(0);
+
+  return parts.find((part) => part.type === "currency").value;
+}
+
+function formatDate(date, style) {
+  const pad = (n) => String(n).padStart(2, "0");
+  const loc = (opts) => new Intl.DateTimeFormat("en-US", opts).format(date);
+
+  const tokens = {
+    YYYY: date.getFullYear(),
+    MMMM: loc({ month: "long" }),
+    MMM: loc({ month: "short" }),
+    MM: pad(date.getMonth() + 1),
+    DD: pad(date.getDate()),
+    dddd: loc({ weekday: "long" }),
+    ddd: loc({ weekday: "short" }),
   };
 
+  return style.replace(/YYYY|MMMM|MMM|MM|DD|dddd|ddd/g, (m) => tokens[m]);
+}
+
+export function getColumns({
+  editTransactionMode,
+  showConfirmToast,
+  currency,
+  dateFormat,
+}) {
   return [
     {
       accessorKey: "date",
@@ -31,16 +58,17 @@ export function getColumns({ onEdit } = {}) {
         );
       },
       cell: ({ row }) => {
-        return <div className="pl-3">{row.original.date}</div>;
+        return (
+          <div className="pl-3">
+            {formatDate(new Date(row.original.date), dateFormat)}
+          </div>
+        );
       },
       sortingFn: "datetime",
     },
     {
       accessorKey: "description",
       header: "Description",
-      cell: ({ row }) => {
-        return <div>{capitalize(row.original.description)}</div>;
-      },
     },
     {
       accessorKey: "category",
@@ -51,7 +79,7 @@ export function getColumns({ onEdit } = {}) {
       },
     },
     {
-      accessorKey: "paymentMethod",
+      accessorKey: "payment_method",
       header: "Payment Method",
     },
     {
@@ -75,7 +103,12 @@ export function getColumns({ onEdit } = {}) {
           <div
             className={`${isIncome ? "text-green-500" : "text-red-500"} pl-3`}
           >
-            {isIncome ? "+" : "-"}${row.getValue("amount")}
+            {isIncome ? "+" : "-"}
+            {getCurrencySymbol(currency)}
+            {Number(row.getValue("amount")).toLocaleString("en", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </div>
         );
       },
@@ -111,11 +144,14 @@ export function getColumns({ onEdit } = {}) {
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() => onEdit?.(data)}
+                onClick={() => editTransactionMode(data)}
               >
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => showConfirmToast(data.id)}
+              >
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

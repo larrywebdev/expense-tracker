@@ -16,7 +16,7 @@ export default function IncomeExpense({ children, style, money }) {
       )}
       <div>
         <span>{children}</span>
-        <span className="text-xl font-medium block">${money}</span>
+        <span className="text-xl font-medium block">{money}</span>
       </div>
     </div>
   );

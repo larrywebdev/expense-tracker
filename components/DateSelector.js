@@ -7,7 +7,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useState } from "react";
-import { Div } from "./AddEditDialog";
+import { Div } from "./AddEditTransaction";
 
 export function DateSelector({ error, form }) {
   const [open, setOpen] = useState(false);

@@ -26,7 +26,9 @@ function MultiSelectFilter({ label, column, options }) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline">{label}</Button>
+        <Button variant="outline" className="flex-1">
+          {label}
+        </Button>
       </PopoverTrigger>
 
       <PopoverContent className="p-0 w-full min-w-40">

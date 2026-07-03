@@ -1,7 +1,6 @@
 import { Geist } from "next/font/google";
-import Sidebar from "../components/Sidebar";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,13 +13,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} antialiased`}>
-        <Toaster position="top-center" />
-        <div>
-          <Sidebar />
-          <div className="p-6 ml-70">{children}</div>
-        </div>
+    <html lang="en" className="h-full">
+      <body className={`${geistSans.variable} min-h-full antialiased`}>
+        <Toaster position="top-center" richColors />
+        {children}
       </body>
     </html>
   );
