@@ -33,14 +33,14 @@ export default function LoginForm() {
   });
 
   return (
-    <div className="grid gap-3 w-75 sm:w-120 border p-8 rounded-2xl bg-white">
+    <div className="grid gap-3 w-75 sm:w-120 border p-5 sm:p-8 rounded-2xl bg-white">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();
         }}
       >
-        <div className="grid gap-5">
+        <div className="grid gap-3 sm:gap-5">
           <div className="grid gap-1 mb-3">
             <span className="font-semibold text-2xl">Log In</span>
             <span className="text-sm text-[#475569]">

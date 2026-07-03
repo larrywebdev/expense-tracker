@@ -39,7 +39,7 @@ export default function Sidebar({ theme }) {
         layout
         animate={{ width: sidebarWidth }}
         transition={{ duration: 0.25, ease: "easeInOut" }}
-        className="fixed min-h-screen z-20 overflow-hidden shrink-0"
+        className="fixed h-full z-20 overflow-hidden shrink-0"
         style={{ backgroundColor: theme ?? "#000080" }}
       >
         <div className="sm:px-2 lg:px-4 px-1.5">

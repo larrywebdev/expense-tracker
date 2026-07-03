@@ -51,7 +51,7 @@ export default function SignUpForm() {
   });
 
   return (
-    <div className="grid gap-3 w-75 sm:w-120 border p-8 rounded-2xl bg-white">
+    <div className="grid gap-3 w-75 sm:w-120 border p-5 sm:p-8 rounded-2xl bg-white">
       <form
         onSubmit={(e) => {
           e.preventDefault();

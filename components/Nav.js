@@ -47,7 +47,7 @@ export default function Nav({ theme }) {
   };
 
   return (
-    <nav className="h-[calc(100vh-100px)] flex flex-col justify-between">
+    <nav className="h-[calc(100vh-150px)] flex flex-col justify-between">
       <div className="space-y-2">
         {NAV_LINKS.map(({ href, label, Icon }) => {
           const isActive = pathname === href;
