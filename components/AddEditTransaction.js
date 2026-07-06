@@ -103,32 +103,14 @@ export function AddEditTransaction({ categories }) {
             e.preventDefault();
             form.handleSubmit();
           }}
-          className="grid overflow-y-scroll"
+          className="overflow-y-auto"
         >
-          <form.Field name="description">
-            {(field) => (
-              <div className="grid">
-                <Label htmlFor={field.name} className="mb-1">
-                  Description
-                </Label>
-                <Div>
-                  <Input
-                    id={field.name}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  {errorMsg(field)}
-                </Div>
-              </div>
-            )}
-          </form.Field>
-
-          <div className="grid sm:flex gap-3">
-            <form.Field name="amount">
+          <div className="grid px-1">
+            <form.Field name="description">
               {(field) => (
                 <div className="grid">
                   <Label htmlFor={field.name} className="mb-1">
-                    Amount
+                    Description
                   </Label>
                   <Div>
                     <Input
@@ -141,21 +123,129 @@ export function AddEditTransaction({ categories }) {
                 </div>
               )}
             </form.Field>
-            <form.Field name="payment_method">
-              {(field) => (
-                <div className="grid">
-                  <Label className="mb-1">Payment Method</Label>
-                  <Div>
-                    <Select
-                      value={field.state.value}
-                      onValueChange={field.handleChange}
-                    >
-                      <SelectTrigger className="w-full sm:w-55">
-                        <SelectValue placeholder={field.state.value} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {["Bank Transfer", "Auto-pay", "Card", "Cash"].map(
-                          (value) => (
+
+            <div className="grid sm:flex gap-3">
+              <form.Field name="amount">
+                {(field) => (
+                  <div className="grid">
+                    <Label htmlFor={field.name} className="mb-1">
+                      Amount
+                    </Label>
+                    <Div>
+                      <Input
+                        id={field.name}
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      {errorMsg(field)}
+                    </Div>
+                  </div>
+                )}
+              </form.Field>
+              <form.Field name="payment_method">
+                {(field) => (
+                  <div className="grid">
+                    <Label className="mb-1">Payment Method</Label>
+                    <Div>
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger className="w-full sm:w-55">
+                          <SelectValue placeholder={field.state.value} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {["Bank Transfer", "Auto-pay", "Card", "Cash"].map(
+                            (value) => (
+                              <SelectItem
+                                className="cursor-pointer"
+                                value={value}
+                                key={value}
+                              >
+                                {value}
+                              </SelectItem>
+                            ),
+                          )}
+                        </SelectContent>
+                      </Select>
+                      {errorMsg(field)}
+                    </Div>
+                  </div>
+                )}
+              </form.Field>
+            </div>
+            <div className="grid sm:flex gap-3">
+              <form.Field name="category">
+                {(field) => (
+                  <div className="grid">
+                    <Label className="mb-1">Category</Label>
+                    <Div>
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger className="w-full sm:w-55">
+                          <SelectValue placeholder={field.state.value} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map(({ label }) => (
+                            <SelectItem
+                              className="cursor-pointer"
+                              value={label}
+                              key={label}
+                            >
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errorMsg(field)}
+                    </Div>
+                  </div>
+                )}
+              </form.Field>
+              <form.Field name="type">
+                {(field) => (
+                  <div className="grid">
+                    <Label className="mb-1">Type</Label>
+                    <Div>
+                      <RadioGroup
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                        className="flex"
+                      >
+                        <div className="flex items-start gap-3">
+                          <RadioGroupItem value="Income" id="r1" />
+                          <Label htmlFor="r1">Income</Label>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <RadioGroupItem value="Expense" id="r2" />
+                          <Label htmlFor="r2">Expense</Label>
+                        </div>
+                      </RadioGroup>
+                      {errorMsg(field)}
+                    </Div>
+                  </div>
+                )}
+              </form.Field>
+            </div>
+            <div className="grid sm:flex gap-3">
+              <DateSelector error={errorMsg} form={form} />
+
+              <form.Field name="status">
+                {(field) => (
+                  <div className="grid">
+                    <Label className="mb-1">Status</Label>
+                    <Div>
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger className="w-full sm:w-55">
+                          <SelectValue placeholder={field.state.value} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {["Completed", "Pending", "Failed"].map((value) => (
                             <SelectItem
                               className="cursor-pointer"
                               value={value}
@@ -163,127 +253,39 @@ export function AddEditTransaction({ categories }) {
                             >
                               {value}
                             </SelectItem>
-                          ),
-                        )}
-                      </SelectContent>
-                    </Select>
-                    {errorMsg(field)}
-                  </Div>
-                </div>
-              )}
-            </form.Field>
-          </div>
-          <div className="grid sm:flex gap-3">
-            <form.Field name="category">
-              {(field) => (
-                <div className="grid">
-                  <Label className="mb-1">Category</Label>
-                  <Div>
-                    <Select
-                      value={field.state.value}
-                      onValueChange={field.handleChange}
-                    >
-                      <SelectTrigger className="w-full sm:w-55">
-                        <SelectValue placeholder={field.state.value} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map(({ label }) => (
-                          <SelectItem
-                            className="cursor-pointer"
-                            value={label}
-                            key={label}
-                          >
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errorMsg(field)}
-                  </Div>
-                </div>
-              )}
-            </form.Field>
-            <form.Field name="type">
-              {(field) => (
-                <div className="grid">
-                  <Label className="mb-1">Type</Label>
-                  <Div>
-                    <RadioGroup
-                      value={field.state.value}
-                      onValueChange={field.handleChange}
-                      className="flex"
-                    >
-                      <div className="flex items-start gap-3">
-                        <RadioGroupItem value="Income" id="r1" />
-                        <Label htmlFor="r1">Income</Label>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <RadioGroupItem value="Expense" id="r2" />
-                        <Label htmlFor="r2">Expense</Label>
-                      </div>
-                    </RadioGroup>
-                    {errorMsg(field)}
-                  </Div>
-                </div>
-              )}
-            </form.Field>
-          </div>
-          <div className="grid sm:flex gap-3">
-            <DateSelector error={errorMsg} form={form} />
-
-            <form.Field name="status">
-              {(field) => (
-                <div className="grid">
-                  <Label className="mb-1">Status</Label>
-                  <Div>
-                    <Select
-                      value={field.state.value}
-                      onValueChange={field.handleChange}
-                    >
-                      <SelectTrigger className="w-full sm:w-55">
-                        <SelectValue placeholder={field.state.value} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {["Completed", "Pending", "Failed"].map((value) => (
-                          <SelectItem
-                            className="cursor-pointer"
-                            value={value}
-                            key={value}
-                          >
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errorMsg(field)}
-                  </Div>
-                </div>
-              )}
-            </form.Field>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline" onClick={() => close()}>
-                Cancel
-              </Button>
-            </DialogClose>
-            <form.Subscribe
-              selector={(state) => [
-                state.canSubmit,
-                state.isSubmitting,
-                state.isPristine,
-              ]}
-            >
-              {([canSubmit, isSubmitting, isPristine]) => (
-                <Button
-                  type="submit"
-                  disabled={isPristine || !canSubmit || isSubmitting}
-                >
-                  {isSubmitting ? "Saving..." : "Save"}
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errorMsg(field)}
+                    </Div>
+                  </div>
+                )}
+              </form.Field>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline" onClick={() => close()}>
+                  Cancel
                 </Button>
-              )}
-            </form.Subscribe>
-          </DialogFooter>
+              </DialogClose>
+              <form.Subscribe
+                selector={(state) => [
+                  state.canSubmit,
+                  state.isSubmitting,
+                  state.isPristine,
+                ]}
+              >
+                {([canSubmit, isSubmitting, isPristine]) => (
+                  <Button
+                    type="submit"
+                    disabled={isPristine || !canSubmit || isSubmitting}
+                  >
+                    {isSubmitting ? "Saving..." : "Save"}
+                  </Button>
+                )}
+              </form.Subscribe>
+            </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
