@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Expense Tracker
+
+A full-stack personal finance application built with Next.js and Supabase that helps users manage income, expenses, and categories through an intuitive dashboard with real-time analytics.
+
+**Live demo:** https://expense-tracker-lime-nu-67.vercel.app
+
+## Features
+
+- Email/password authentication with protected routes (unauthenticated users are redirected to `/login`)
+- Add, edit, and delete transactions (type, category, amount, payment method, status, date)
+- Transactions table with debounced search, multi-select category filtering, date/status filtering, sorting, and pagination
+- Custom categories with a 21-color picker
+- Dashboard with income/expense totals and a category breakdown pie chart
+- Per-user settings: currency (15 supported), date format, and theme color, all reflected across the app
+- Confirm-before-delete flow using toast notifications
+- Fully responsive layout
+
+## Tech Stack
+
+| Layer              | Tools                                               |
+| ------------------ | --------------------------------------------------- |
+| Framework          | Next.js 16 (App Router), React 19                   |
+| Styling / UI       | Tailwind CSS 4, shadcn/ui (Radix UI), Framer Motion |
+| Forms & validation | TanStack Form, Zod                                  |
+| Data & state       | TanStack Table, Zustand                             |
+| Charts             | MUI X Charts, Recharts                              |
+| Backend            | Supabase (Postgres + Auth), Next.js Server Actions  |
+| Other              | Sonner (toasts), date-fns                           |
+
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/signup.png" width="48%">
+  <img src="screenshots/login.png" width="48%">
+</p>
+
+<p align="center">
+  <img src="screenshots/dashboard.png" width="48%">
+  <img src="screenshots/transactions.png" width="48%">
+</p>
+<p align="center">
+  <img src="screenshots/categories.png" width="48%">
+  <img src="screenshots/settings.png" width="48%">
+</p>
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- A [Supabase](https://supabase.com) project
+
+### Installation
+
+```bash
+git clone https://github.com/larrywebdev/expense-tracker.git
+cd expense-tracker
+npm install
+```
+
+### Environment variables
+
+Create a `.env.local` file in the project root:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
+```
+
+### Database setup
+
+This project expects three tables in your Supabase project:
+
+- **`expense-tracker-transactions`** — `id, type, category, amount, status, payment_method, description, date, user_id`
+- **`expense-tracker-categories`** — `id, user_id, label, color`
+- **`expense-tracker-user-settings`** — `user_id, currency, date_format, theme_color`
+
+Enable Row Level Security and scope each table to the authenticated `user_id`.
+
+### Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Other scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build   # Production build
+npm run start   # Run production build
+npm run lint     # Run ESLint
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  (auth)/login, (auth)/signup   # Public auth routes
+  (main)/dashboard              # Overview + charts
+  (main)/transactions           # Transactions table + CRUD
+  (main)/categories             # Category management
+  (main)/settings               # User preferences
+components/                     # Shared UI components
+lib/
+  data-service.js                # Server actions (CRUD)
+  schema/                        # Zod validation schemas
+  supabase/                      # Supabase client + session handling
+store/                          # Zustand stores
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Larry
 
-## Deploy on Vercel
+GitHub: https://github.com/larrywebdev
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+No license specified yet.
