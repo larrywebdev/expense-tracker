@@ -1,3 +1,5 @@
+![Dashboard Preview](screenshots/dashboard.png)
+
 # Expense Tracker
 
 A full-stack personal finance application built with Next.js and Supabase that helps users manage income, expenses, and categories through an intuitive dashboard with real-time analytics.
@@ -27,7 +29,17 @@ A full-stack personal finance application built with Next.js and Supabase that h
 | Backend            | Supabase (Postgres + Auth), Next.js Server Actions  |
 | Other              | Sonner (toasts), date-fns                           |
 
-## Screenshots
+## Screenshots and Videos
+
+<iframe
+  src="https://player.cloudinary.com/embed/?cloud_name=dh4gfd8ey&public_id=2026-07-0614-35-00-ezgif.com-video-to-gif-converter_t4jxov"
+  width="640"
+  height="360" 
+  style="height: auto; width: 100%; aspect-ratio: 640 / 360;"
+  allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+  allowfullscreen
+  frameborder="0"
+></iframe>
 
 <p align="center">
   <img src="screenshots/signup.png" width="48%">
